@@ -53,6 +53,8 @@ from api.middleware.authMiddleware import AuthMiddleware
 import logging
 from api.router import app, public_api_router, api_router
 
+# Import codegen integration
+from api.codegen_integration import setup_codegen_integration, feature_flags
 
 logger = logfire
 logfire.configure(
@@ -201,6 +203,11 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+# Set up codegen integration if enabled
+if feature_flags.is_enabled("organization_auth"):
+    logger.info("Enabling codegen organization-based authentication")
+    app = setup_codegen_integration(app)
 
 logfire.instrument_fastapi(
     app,
